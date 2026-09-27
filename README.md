@@ -57,3 +57,7 @@ Frameworks and operational infrastructure for post-exploitation.
 
 ***
 
+### 🙏 Acknowledgements & Credits
+
+* [**HackTheBox**](https://www.hackthebox.com/) **& HTB Academy** — Invaluable labs, realistic Active Directory attack paths, and high-quality module content that formed the foundation for many of the techniques and scenarios documented here.
+* [**ChatGPT (OpenAI)**](https://chatgpt.com/) — Assisted in structuring, refining, debugging commands, and synthesizing concepts into accessible cheatsheets and explanations.
