@@ -1,0 +1,41 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Active Directory & Windows Notes
+  structure:
+    - type: section
+      key: section-active-directory
+      title: Active Directory
+      path: active-directory
+      default: true
+      children:
+        - type: space
+          key: space-ad-intro
+          title: Introduction to Active Directory
+          path: intro
+          default: true
+          content:
+            directory: ./active_directory/intro
+        - type: space
+          key: space-ad-enumeration-and-attacks
+          title: Active Directory Enumeration & Attacks
+          path: enumeration-and-attacks
+          content:
+            directory: ./active_directory/enumeration_and_attacks
+        - type: space
+          key: space-ad-command-and-control
+          title: Command & Control
+          path: command-and-control
+          content:
+            directory: ./active_directory/command_and_control/sliver
+    - type: section
+      key: section-windows
+      title: Windows
+      path: windows
+      children:
+        - type: space
+          key: space-windows-fundamentals
+          title: Windows Fundamentals
+          path: fundamentals
+          default: true
+          content:
+            directory: ./windows
