@@ -1,6 +1,6 @@
 # Table of contents
 
-* [README](README.md)
+* [HOME](README.md)
 
 ## Intro to Active Directory
 

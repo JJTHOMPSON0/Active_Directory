@@ -1,64 +1,63 @@
----
-hidden: true
----
+# HOME
 
-# README
+## 🛡️ Welcome to the Security Knowledge Base
 
-A beginner-friendly collection of notes on Active Directory and Windows internals, covering enumeration, attacks, privilege escalation, and C2 frameworks.
+A practical, beginner-to-advanced reference library covering Active Directory exploitation, Windows OS internals, privilege escalation, and Command & Control operations.
 
-> 📖 **Read the full notes on GitBook** _(link your GitBook space here)_
+Use the categories below or the left sidebar to jump into any module.
 
 ***
 
-## 📁 Structure
+### 📚 Explore by Category
 
-```
-active_directory/
-├── intro/                   # AD fundamentals, protocols, users, policies
-├── enumeration_and_attacks/ # Enumeration techniques, exploits, lateral movement
-└── command_and_control/
-    └── sliver/              # Sliver C2 framework
+#### 🏢 1. [Introduction to Active Directory](https://app.gitbook.com/s/SarIFVyhd0Jzn353JliZ/intro-to-active-directory)
 
-windows/                     # Windows OS fundamentals & internals
-```
+Understand how Active Directory is structured, how authentication works, and how policies govern enterprise networks.
 
-***
-
-## 🗂️ Topics
-
-### Active Directory — Intro
-
-| Note                                                                                       | Description                  |
-| ------------------------------------------------------------------------------------------ | ---------------------------- |
-| [Active Directory Fundamentals](<active_directory/intro/Active Directory Fundamentals.md>) | Core AD concepts             |
-| [Active Directory Protocols](<active_directory/intro/Active Directory Protocols.md>)       | LDAP, Kerberos, NTLM etc.    |
-| [All About Users](<active_directory/intro/All About Users.md>)                             | User objects and attributes  |
-| [RODCs](active_directory/intro/RODCs.md)                                                   | Read-Only Domain Controllers |
-| [Securities and Policies](<active_directory/intro/Securities and Policies.md>)             | GPOs and security policies   |
-
-### Active Directory — Enumeration & Attacks
-
-| Note                                                                                                   | Description                 |
-| ------------------------------------------------------------------------------------------------------ | --------------------------- |
-| [AD Enumeration](<active_directory/enumeration_and_attacks/Active Directory Enumeration.md>)           | Full enumeration cheatsheet |
-| [Kerberoasting](active_directory/enumeration_and_attacks/Kerberoasting.md)                             | SPN-based hash cracking     |
-| [AD CS ESC8](<active_directory/enumeration_and_attacks/AD CS ESC8.md>)                                 | Certificate Services abuse  |
-| [BadSuccessor](active_directory/enumeration_and_attacks/BadSuccessor.md)                               | dMSA privilege escalation   |
-| [Cross-Forests Trusts Abuse](<active_directory/enumeration_and_attacks/Cross-Forests Trusts Abuse.md>) | Forest trust attacks        |
-| [MSSQL Attacks](<active_directory/enumeration_and_attacks/MSSQL ATTACKS.md>)                           | SQL Server lateral movement |
-| [GodPotato (LPE)](<active_directory/enumeration_and_attacks/GodPotato (LPE).md>)                       | Local privilege escalation  |
-| _(and more...)_                                                                                        |                             |
-
-### Windows Fundamentals
-
-| Note                                                                                | Description               |
-| ----------------------------------------------------------------------------------- | ------------------------- |
-| [Core of the OS](<windows/Core of the Operating System.md>)                         | Kernel, processes, memory |
-| [Interacting with Windows](<windows/Interacting with Windows.md>)                   | CLI, PowerShell, GUI      |
-| [Working with Services & Processes](<windows/Working with Service & Processess.md>) | Service management        |
+* **Active Directory Fundamentals** — Forests, domains, trusts, OUs, and objects.
+* **Active Directory Protocols** — Deep dive into LDAP, Kerberos, SMB, and RPC.
+* **All About Users** — User accounts, service accounts, and attributes.
+* **RODCs (Read-Only Domain Controllers)** — Architecture and credential caching.
+* **Securities and Policies** — GPOs, password policies, and security baselines.
 
 ***
 
-## 🤝 Contributing
+#### ⚔️ 2. [Active Directory Attacks & Enumeration](./#id-2.-active-directory-attacks-and-enumeration)
 
-Open to contributions! Notes are continuously updated. PRs and suggestions are welcome.
+Actionable attack guides, credential harvesting techniques, and privilege escalation vectors.
+
+* **Active Directory Enumeration** — Full enumeration cheatsheet.
+* **Kerberoasting** — Service Principal Name (SPN) extraction and cracking.
+* **AD CS ESC8** — Active Directory Certificate Services NTLM relaying.
+* **AD Delegation (RBCD)** — Resource-Based Constrained Delegation abuse.
+* **BadSuccessor** — Delegated Managed Service Account (dMSA) exploitation.
+* **BloodHound Alternative** — Graph visualization and graph-less alternatives.
+* **GodPotato (Local Privilege Escalation)** — Abusing `SeImpersonatePrivilege` to SYSTEM.
+* **MSSQL Attacks** — Database link crawling and command execution.
+
+***
+
+#### 💻 3. [Windows Fundamentals & Internals](./#id-3.-windows-fundamentals-and-internals)
+
+Essential Windows operating system mechanisms, architecture, and administration tools.
+
+* **Core of the Operating System** — File systems, NTFS permissions, and system architecture.
+* **Interacting with Windows** — CMD, PowerShell, and system navigation.
+* **Deep into Windows** — Registry, SAM hive, and system configuration.
+* **Working with Services & Processes** — Windows services, process trees, and privileges.
+* **Further Windows Usage** — System management and utility tools.
+
+***
+
+#### 🎯 4. [Command & Control (C2)](./#id-4.-command-and-control-c2)
+
+Frameworks and operational infrastructure for post-exploitation.
+
+* **Sliver Download and CLI** — Setting up BishopFox's Sliver C2, listeners, and implants.
+
+***
+
+> 💡 **Tip:** Use the search bar (`Ctrl + K`) at the top of the page anytime to search across all commands, tools, and attack vectors.
+
+──────
+
