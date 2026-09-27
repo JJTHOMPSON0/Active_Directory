@@ -1,8 +1,12 @@
-# Ignore all files by default
-*
+# Track everything by default
 
-# Allow the specific web assets and configs
-!index.html
-!styles.css
-!scripts.js
-!.gitignore
+# Ignore old website files (kept locally but not in git)
+index.html
+styles.css
+scripts.js
+ad_pentest_guide.html
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+*.tmp
