@@ -4,7 +4,7 @@
 
 A practical, beginner-to-advanced reference library covering Active Directory exploitation, Windows OS internals, privilege escalation, and Command & Control operations.
 
-Use the categories below to jump into any module.
+Use the categories below to jump into any module or if u wanna visit the gitbook site:[https://deepanshu.gitbook.io/deepanshu-docs](https://deepanshu.gitbook.io/deepanshu-docs)
 
 ***
 
