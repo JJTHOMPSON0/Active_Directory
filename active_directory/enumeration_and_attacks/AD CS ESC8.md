@@ -1,9 +1,10 @@
-**`NTLM relay to the CA's web enrollment service`**
-==But where NTLM is disabled, u can still use kerberos relaying over smb instead using `krbrealyx`==  
+# AD CS ESC8
 
-==SOURCE==**`LAB:VulnCicada`**
+**`NTLM relay to the CA's web enrollment service`** ==But where NTLM is disabled, u can still use kerberos relaying over smb instead using `krbrealyx`==
 
-### Part 1: What is AD CS, and why does it exist?
+\==SOURCE==**`LAB:VulnCicada`**
+
+#### Part 1: What is AD CS, and why does it exist?
 
 Active Directory Certificate Services is Microsoft's PKI (Public Key Infrastructure) system bolted onto AD. Its job is to issue **digital certificates** to users, computers, and services — for things like smart card login, HTTPS, code signing, VPN auth, etc.
 
@@ -11,23 +12,24 @@ The key fact that makes AD CS attackable: **in AD, a certificate can be used as 
 
 This is called **PKINIT** (public key cryptography for initial authentication in Kerberos). It's exactly what `certipy-ad auth -pfx unknown6960.pfx` did in your run — it took a `.pfx` (a certificate + private key bundle) and traded it for a Kerberos TGT.
 
-### Part 2: Certificate Templates
+#### Part 2: Certificate Templates
 
 A **template** is a blueprint AD CS uses to decide: who can request this kind of certificate, and what identity/permissions does the resulting certificate grant?
 
 Example templates:
 
-- `User` — normal employee cert for signing emails, etc. Low privilege.
-- `DomainController` — a special template meant _only_ for domain controllers to prove their own machine identity to each other. Extremely high privilege, because a cert from this template says "I am a Domain Controller" — which is basically as powerful as being Domain Admin.
+* `User` — normal employee cert for signing emails, etc. Low privilege.
+* `DomainController` — a special template meant _only_ for domain controllers to prove their own machine identity to each other. Extremely high privilege, because a cert from this template says "I am a Domain Controller" — which is basically as powerful as being Domain Admin.
 
 In your command:
+
 ```bash
 --template DomainController
 ```
 
 You told the CA "please issue me a certificate using the DomainController blueprint." Normally, only an actual DC's machine account is _allowed_ to request that template. You couldn't request it yourself as `Rosie.Powell` — that request would just be denied. This is the whole reason the attack needed **relaying**: you needed to make the _request_ actually come from the DC's own identity, not yours.
 
-### Part 3: Why relaying? What is "relaying," concretely?
+#### Part 3: Why relaying? What is "relaying," concretely?
 
 Authentication protocols like NTLM and Kerberos work by proving identity via a **challenge/response exchange** — some cryptographic proof that's tied to a specific network session.
 
@@ -54,7 +56,7 @@ Kerberos tickets _are_ normally tied to a specific target service (the SPN — S
 
 That's ESC8 exactly: **"Web Enrollment is enabled over HTTP"** is dangerous specifically because HTTP enrollment lacks the strong channel-binding protections that would normally stop a relayed ticket from being accepted for the wrong purpose.
 
-### Part 4: Coercion — how do you make the DC authenticate to you at all?
+#### Part 4: Coercion — how do you make the DC authenticate to you at all?
 
 Domain controllers don't just randomly connect out to a random attacker box. You have to _trigger_ it. This is what **PetitPotam** and its cousins do — they abuse legitimate Windows RPC functions that were never meant for this purpose.
 
@@ -62,23 +64,24 @@ Domain controllers don't just randomly connect out to a random attacker box. You
 
 So the "attack" is essentially: _"Hey DC, please go check this file for me: `\\attacker.cicada.vl\whatever`"_ — and the DC, trying to be helpful, authenticates to your machine to fetch it. That authentication attempt is the thing krbrelayx catches and relays.
 
-This requires you to already have _some_ valid domain credentials (Rosie.Powell's) to even call the EFSRPC function in the first place — coercion isn't unauthenticated, it just doesn't require _privileged_ creds.
-![](../../../ZMEDIA/Pasted%20image%2020260721214203.png)
-### Part 5: Tying your whole session together, step by step
+This requires you to already have _some_ valid domain credentials (Rosie.Powell's) to even call the EFSRPC function in the first place — coercion isn't unauthenticated, it just doesn't require _privileged_ creds.&#x20;
 
-|Step|What happened|Why|
-|---|---|---|
-|DNS record add|`attacker.cicada.vl → 10.10.14.32`|Gives your box a legit-looking domain hostname, required because Kerberos tickets are hostname-bound|
-|`krbrelayx.py -t http://.../certfnsh.asp --adcs --template DomainController`|Starts listening on SMB (445) _and_ proxies to the CA's HTTP enrollment page|Sets the trap and the relay target simultaneously|
-|`nxc ... coerce_plus ... PetitPotam`|Told the DC "go open this file at `\\attacker.cicada.vl\...`"|Forces the DC to authenticate to your listener|
-|DC authenticates via Kerberos to your fake host|krbrelayx captures the AP-REQ|This is literally the DC's own identity being used|
-|krbrelayx relays that AP-REQ to `certsrv/certfnsh.asp`|AD CS issues a cert for `DC-JPQ225$` under the `DomainController` template|ESC8: HTTP enrollment doesn't validate the ticket was meant for it|
-|`certipy-ad auth -pfx ...`|Cert → PKINIT → Kerberos TGT as `DC-JPQ225$`|Cert = provable identity|
-|`secretsdump.py -k ... DC-JPQ225$`|DCSync — DC machine accounts have replication rights by design|Now you have _every_ domain account's hash, including Administrator|
+#### Part 5: Tying your whole session together, step by step
+
+| Step                                                                         | What happened                                                                | Why                                                                                                  |
+| ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| DNS record add                                                               | `attacker.cicada.vl → 10.10.14.32`                                           | Gives your box a legit-looking domain hostname, required because Kerberos tickets are hostname-bound |
+| `krbrelayx.py -t http://.../certfnsh.asp --adcs --template DomainController` | Starts listening on SMB (445) _and_ proxies to the CA's HTTP enrollment page | Sets the trap and the relay target simultaneously                                                    |
+| `nxc ... coerce_plus ... PetitPotam`                                         | Told the DC "go open this file at `\\attacker.cicada.vl\...`"                | Forces the DC to authenticate to your listener                                                       |
+| DC authenticates via Kerberos to your fake host                              | krbrelayx captures the AP-REQ                                                | This is literally the DC's own identity being used                                                   |
+| krbrelayx relays that AP-REQ to `certsrv/certfnsh.asp`                       | AD CS issues a cert for `DC-JPQ225$` under the `DomainController` template   | ESC8: HTTP enrollment doesn't validate the ticket was meant for it                                   |
+| `certipy-ad auth -pfx ...`                                                   | Cert → PKINIT → Kerberos TGT as `DC-JPQ225$`                                 | Cert = provable identity                                                                             |
+| `secretsdump.py -k ... DC-JPQ225$`                                           | DCSync — DC machine accounts have replication rights by design               | Now you have _every_ domain account's hash, including Administrator                                  |
 
 The elegant/nasty part of this chain: every individual step (DNS write, EFSRPC call, cert request, DCSync as a DC) is something a _real_ DC or admin tool does routinely — the attack is entirely about tricking legitimate mechanisms into cooperating in the wrong order, not exploiting a memory-corruption bug.
 
 Blog:
+
 ```cardlink
 url: https://www.synacktiv.com/publications/relaying-kerberos-over-smb-using-krbrelayx.html
 title: "Relaying Kerberos over SMB using krbrelayx"
@@ -87,8 +90,7 @@ host: www.synacktiv.com
 image: https://www.synacktiv.com/sites/default/files/styles/blog_grid_view/public/2024-11/9azn60_copy_660x330.jpg
 ```
 
-
-### ESC8 specifically
+#### ESC8 specifically
 
 ESC1 through ESC11+ (the naming comes from SpecterOps' original AD CS research) are a taxonomy of distinct AD CS misconfigurations. Each number is a _different_ root cause — they're not escalating severity levels, just an enumerated list of separate bugs/misconfigs. ESC8 is specifically about a **transport-layer weakness**, not a template misconfiguration.
 
@@ -110,7 +112,7 @@ So _any_ authenticated user (like Rosie.Powell) could reach the enrollment endpo
 
 If EPA had been enabled on that web enrollment endpoint, your relayed AP-REQ would've been rejected outright, because it was authenticated on a _different_ connection (the SMB session with the DC) than the one submitting the HTTP cert request.
 
-### What is an AP-REQ?
+#### What is an AP-REQ?
 
 This is Kerberos internals, so let's build it from the ground up.
 
