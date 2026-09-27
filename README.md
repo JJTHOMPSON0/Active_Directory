@@ -22,7 +22,7 @@ Understand how Active Directory is structured, how authentication works, and how
 
 ***
 
-#### ⚔️ 2. [Active Directory Attacks & Enumeration](./#id-2.-active-directory-attacks-and-enumeration)
+#### ⚔️ 2. [Active Directory Attacks & Enumeration](https://app.gitbook.com/s/SarIFVyhd0Jzn353JliZ/enumeration-and-attacks)
 
 Actionable attack guides, credential harvesting techniques, and privilege escalation vectors.
 
@@ -37,7 +37,7 @@ Actionable attack guides, credential harvesting techniques, and privilege escala
 
 ***
 
-#### 💻 3. [Windows Fundamentals & Internals](./#id-3.-windows-fundamentals-and-internals)
+#### 💻 3. [Windows Fundamentals & Internals](https://app.gitbook.com/s/SarIFVyhd0Jzn353JliZ/windows-fundamentals)
 
 Essential Windows operating system mechanisms, architecture, and administration tools.
 
@@ -49,7 +49,7 @@ Essential Windows operating system mechanisms, architecture, and administration 
 
 ***
 
-#### 🎯 4. [Command & Control (C2)](./#id-4.-command-and-control-c2)
+#### 🎯 4. [Command & Control (C2)](https://app.gitbook.com/s/SarIFVyhd0Jzn353JliZ/command-and-control)
 
 Frameworks and operational infrastructure for post-exploitation.
 
