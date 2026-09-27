@@ -1,12 +1,9 @@
-# Track everything by default
+# Website files and deployments (ignored from git, kept locally)
+*.html
+*.css
+*.js
 
-# Ignore old website files (kept locally but not in git)
-index.html
-styles.css
-scripts.js
-ad_pentest_guide.html
-
-# Ignore system files
+# System & temporary files
 .DS_Store
 Thumbs.db
 *.tmp
