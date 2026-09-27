@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # README
 
 A beginner-friendly collection of notes on Active Directory and Windows internals, covering enumeration, attacks, privilege escalation, and C2 frameworks.
