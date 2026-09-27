@@ -4,13 +4,13 @@
 
 A practical, beginner-to-advanced reference library covering Active Directory exploitation, Windows OS internals, privilege escalation, and Command & Control operations.
 
-Use the categories below or the left sidebar to jump into any module.
+Use the categories below to jump into any module.
 
 ***
 
 ### 📚 Explore by Category
 
-#### 🏢 1. [Introduction to Active Directory](https://app.gitbook.com/s/SarIFVyhd0Jzn353JliZ/intro-to-active-directory)
+#### 🏢 1. [Introduction to Active Directory](<active_directory/intro/Active Directory Fundamentals.md>)
 
 Understand how Active Directory is structured, how authentication works, and how policies govern enterprise networks.
 
@@ -56,8 +56,4 @@ Frameworks and operational infrastructure for post-exploitation.
 * **Sliver Download and CLI** — Setting up BishopFox's Sliver C2, listeners, and implants.
 
 ***
-
-> 💡 **Tip:** Use the search bar (`Ctrl + K`) at the top of the page anytime to search across all commands, tools, and attack vectors.
-
-──────
 
