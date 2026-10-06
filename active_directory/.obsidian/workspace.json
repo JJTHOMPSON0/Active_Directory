@@ -1,0 +1,195 @@
+{
+  "main": {
+    "id": "a9756c40cb9b125f",
+    "type": "split",
+    "children": [
+      {
+        "id": "69c986a1fd72e138",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4de959e6050059a2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "enumeration_and_attacks/AD_Kerberos_Authentication.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "AD_Kerberos_Authentication"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "52d855a34467971a",
+    "type": "split",
+    "children": [
+      {
+        "id": "3d7a08410d4450a6",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d827bc823b2941be",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "361be23cbe46366a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "60ad11343e46c34f",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "e2e8467211442186",
+    "type": "split",
+    "children": [
+      {
+        "id": "6908e1779910de1a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6dccdaff33f6810d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "enumeration_and_attacks/AD_Kerberos_Authentication.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks"
+            }
+          },
+          {
+            "id": "5b466fca00431d09",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "enumeration_and_attacks/AD_Kerberos_Authentication.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links"
+            }
+          },
+          {
+            "id": "23668d17ff90ea8a",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "5cb7924d7bb09b1a",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "8ac74c33fdbde93b",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "enumeration_and_attacks/AD_Kerberos_Authentication.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "4de959e6050059a2",
+  "lastOpenFiles": [
+    "enumeration_and_attacks/Why So Trusting(INTERNAL).md"
+  ]
+}
