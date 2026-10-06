@@ -31,6 +31,7 @@ Actionable attack guides, credential harvesting techniques, and privilege escala
 * **AD CS ESC8** — Active Directory Certificate Services NTLM relaying.
 * **AD Delegation (RBCD)** — Resource-Based Constrained Delegation abuse.
 * **BadSuccessor** — Delegated Managed Service Account (dMSA) exploitation.
+* **Shadow Creds** — Abusing msDS-KeyCredentialLink
 * **BloodHound Alternative** — Graph visualization and graph-less alternatives.
 * **GodPotato (Local Privilege Escalation)** — Abusing `SeImpersonatePrivilege` to SYSTEM.
 * **MSSQL Attacks** — Database link crawling and command execution.
