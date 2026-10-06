@@ -12,33 +12,33 @@
 
 Attackers can use Impacket’s [ntlmrelayx](https://github.com/fortra/impacket/blob/master/examples/ntlmrelayx.py) to listen for inbound connections and relay them to the web enrollment service using the following command:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210736.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210736.png)
 
 **Note:** The value passed to `--template` may be different in other environments. This is simply the certificate template which is used by Domain Controllers for authentication. This can be enumerated with tools like [certipy](https://github.com/ly4k/Certipy).
 
 Attackers can either wait for victims to attempt authentication against their machine randomly, or they can actively coerce them into doing so. One way to force machine accounts to authenticate against arbitrary hosts is by exploiting the [printer bug](https://github.com/dirkjanm/krbrelayx/blob/master/printerbug.py). This attack requires the targeted machine account to have the `Printer Spooler` service running. The command below forces `10.129.234.109 (DC01)` to attempt authentication against `10.10.16.12 (attacker host)`:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210800.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210800.png)
 
 Referring back to `ntlmrelayx`, we can see from the output that the authentication request was successfully relayed to the web enrollment application, and a certificate was issued for `DC01$`:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210823.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210823.png)
 
 We can now perform a `Pass-the-Certificate` attack to obtain a TGT as `DC01$`. One way to do this is by using [gettgtpkinit.py](https://github.com/dirkjanm/PKINITtools/blob/master/gettgtpkinit.py). First, let's clone the repository and install the dependencies:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210838.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210838.png)
 
 Then, we can begin the attack.
 
 **Note:** If you encounter error stating `"Error detecting the version of libcrypto"`, it can be fixed by installing the [oscrypto](https://github.com/wbond/oscrypto) library.
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210850.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210850.png)
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210904.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210904.png)
 
 Once we successfully obtain a TGT, we're back in familiar Pass-the-Ticket (PtT) territory. As the domain controller's machine account, we can perform a DCSync attack to, for example, retrieve the NTLM hash of the domain administrator account:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210937.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210937.png)
 
 ## Shadow Credentials (msDS-KeyCredentialLink)
 
@@ -48,16 +48,16 @@ Once we successfully obtain a TGT, we're back in familiar Pass-the-Ticket (PtT) 
 
 We can use [pywhisker](https://github.com/ShutdownRepo/pywhisker) to perform this attack from a Linux system. The command below generates an `X.509 certificate` and writes the `public key` to the victim user's `msDS-KeyCredentialLink` attribute:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006210951.png)
+![](../../ZMEDIA/Pasted%20image%2020261006210951.png)
 
 In the output above, we can see that a `PFX (PKCS12)` file was created (`eFUVVTPf.pfx`), and the password is shown. We will use this file with `gettgtpkinit.py` to acquire a TGT as the victim:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006211007.png)
+![](../../ZMEDIA/Pasted%20image%2020261006211007.png)
 
 With the TGT obtained, we may once again `pass the ticket`:
 
-![](../../../ZMEDIA/Pasted%20image%2020261006211024.png)
+![](../../ZMEDIA/Pasted%20image%2020261006211024.png)
 
 In this case, we discovered that the victim user is a member of the `Remote Management Users` group, which permits them to connect to the machine via `WinRM`. As demonstrated in the previous section, we can use `Evil-WinRM` to connect using Kerberos (note: ensure that `krb5.conf` is properly configured):
 
-![](../../../ZMEDIA/Pasted%20image%2020261006211050.png)
+![](../../ZMEDIA/Pasted%20image%2020261006211050.png)
