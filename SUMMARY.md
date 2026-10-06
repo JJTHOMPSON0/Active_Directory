@@ -30,6 +30,7 @@
 * [Hunting For A User](<active_directory/enumeration_and_attacks/Hunting For  A User.md>)
 * [Kerberoasting](active_directory/enumeration_and_attacks/Kerberoasting.md)
 * [MSSQL Attacks](<active_directory/enumeration_and_attacks/MSSQL ATTACKS.md>)
+* [Shadow_Creds & AD CS8](<active_directory/enumeration_and_attacks/Pass the cert(AD CS8 & Shadow Credentials).md>)
 * [ntpdate for Kerberos Auth](<active_directory/enumeration_and_attacks/ntpdate for kerberos auth.md>)
 * [PowerShell One-liner: Getting Shell](<active_directory/enumeration_and_attacks/Powershell one liner, getting shell with shell.ps1.md>)
 * [Proxychains](active_directory/enumeration_and_attacks/Proxychains.md)
