@@ -38,13 +38,13 @@ Before issuing the command to create the dump file, we must determine what proce
 
 From cmd, we can issue the command `tasklist /svc` to find `lsass.exe` and its process ID.
 
-![](../../../ZMEDIA/Pasted%20image%2020261008220507.png)
+![](../../ZMEDIA/Pasted%20image%2020261008220507.png)
 
 #### Finding LSASS's PID in PowerShell
 
 From PowerShell, we can issue the command `Get-Process lsass` and see the process ID in the `Id` field.
 
-![](../../../ZMEDIA/Pasted%20image%2020261008220524.png)
+![](../../ZMEDIA/Pasted%20image%2020261008220524.png)
 Once we have the PID assigned to the LSASS process, we can create a dump file.
 
 #### Creating a dump file using PowerShell
@@ -66,30 +66,30 @@ Once we have the dump file on our attack host, we can use a powerful tool called
 
 The command initiates the use of `pypykatz` to parse the secrets hidden in the LSASS process memory dump. We use `lsa` in the command because LSASS is a subsystem of the `Local Security Authority`, then we specify the data source as a `minidump` file, proceeded by the path to the dump file stored on our attack host. Pypykatz parses the dump file and outputs the findings:
 
- ![](../../../ZMEDIA/Pasted%20image%2020261008220656.png)
+ ![](../../ZMEDIA/Pasted%20image%2020261008220656.png)
 
 Lets take a more detailed look at some of the useful information in the output.
 
 #### MSV
 
-![](../../../ZMEDIA/Pasted%20image%2020261008220709.png)
+![](../../ZMEDIA/Pasted%20image%2020261008220709.png)
 
 [MSV](https://docs.microsoft.com/en-us/windows/win32/secauthn/msv1-0-authentication-package) is an authentication package in Windows that LSA calls on to validate logon attempts against the SAM database. Pypykatz extracted the `SID`, `Username`, `Domain`, and even the `NT` & `SHA1` password hashes associated with the bob user account's logon session stored in LSASS process memory. This will prove helpful in the next step of our attack covered at the end of this section.
 
 #### WDIGEST
 
-![](../../../ZMEDIA/Pasted%20image%2020261008220724.png)
+![](../../ZMEDIA/Pasted%20image%2020261008220724.png)
 
 `WDIGEST` is an older authentication protocol enabled by default in `Windows XP` - `Windows 8` and `Windows Server 2003` - `Windows Server 2012`. LSASS caches credentials used by WDIGEST in clear-text. This means if we find ourselves targeting a Windows system with WDIGEST enabled, we will most likely see a password in clear-text. Modern Windows operating systems have WDIGEST disabled by default. Additionally, it is essential to note that Microsoft released a security update for systems affected by this issue with WDIGEST. We can study the details of that security update [here](https://msrc-blog.microsoft.com/2014/06/05/an-overview-of-kb2871997/).
 
 #### Kerberos
 
-![](../../../ZMEDIA/Pasted%20image%2020261008220740.png)
+![](../../ZMEDIA/Pasted%20image%2020261008220740.png)
 
 [Kerberos](https://web.mit.edu/kerberos/#what_is) is a network authentication protocol used by Active Directory in Windows Domain environments. Domain user accounts are granted tickets upon authentication with Active Directory. This ticket is used to allow the user to access shared resources on the network that they have been granted access to without needing to type their credentials each time. LSASS caches `passwords`, `ekeys`, `tickets`, and `pins` associated with Kerberos. It is possible to extract these from LSASS process memory and use them to access other systems joined to the same domain.
 
 #### DPAPI
 
-![](../../../ZMEDIA/Pasted%20image%2020261008220755.png)
+![](../../ZMEDIA/Pasted%20image%2020261008220755.png)
 
 Mimikatz and Pypykatz can extract the DPAPI `masterkey` for logged-on users whose data is present in LSASS process memory. These masterkeys can then be used to decrypt the secrets associated with each of the applications using DPAPI and result in the capturing of credentials for various accounts. DPAPI attack techniques are covered in greater detail in the [Windows Privilege Escalation](https://academy.hackthebox.com/module/details/67) module.
