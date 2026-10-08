@@ -41,6 +41,13 @@
 * [UAC Bypass Msconfig](<active_directory/enumeration_and_attacks/UAC Bypass Msconfig.md>)
 * [Users Enum NXC](<active_directory/enumeration_and_attacks/Users Enum NXC.md>)
 * [Why So Trusting? (Internal)](<active_directory/enumeration_and_attacks/Why So Trusting(INTERNAL).md>)
+* [Attacking LSASS](<active_directory/enumeration_and_attacks/Attacking LSASS.md>)
+* [Attacking SAM, SYSTEM, and SECURITY](<active_directory/enumeration_and_attacks/Attacking SAM, SYSTEM, and SECURITY.md>)
+* [Attacking Windows Credential Manager](<active_directory/enumeration_and_attacks/Attacking Windows Credential Manager.md>)
+* [LaZagne](<active_directory/enumeration_and_attacks/LaZagne.md>)
+* [Pass the Hash (PtH)](<active_directory/enumeration_and_attacks/Pass the Hash (PtH).md>)
+* [Pass the Ticket (PtT) from Windows](<active_directory/enumeration_and_attacks/Pass the Ticket (PtT) from Windows.md>)
+* [Windows Authentication Process](<active_directory/enumeration_and_attacks/Windows Authentication Process.md>)
 
 ## Command & Control
 
